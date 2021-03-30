@@ -16,29 +16,20 @@ for i in range(1, 51):
 file2 = open(
     "G:/University/SEMESTER/SIXSEMESTER/IR/assignment/ass1/dataset/Stopword-List.txt", 'r',  encoding='utf8')
 lines = file2.readlines()
-
+# creating a list of stop word each word is strip before adding to stop word list
 stopwords = []
 for i in lines:
     if(i.rstrip("\n") != ""):
         stopwords.append(i.rstrip("\n").strip())
 print(stopwords)
 
-# ps = PorterStemmer()
 
-
+# breaking the value to tokens add position to the document
 def preprocessing(sentence):
     sentence = sentence.lower()
     tokenizer = RegexpTokenizer(r'\w+')
     tokens = tokenizer.tokenize(sentence)
 
-    # stem_tokens = []
-    # for token in tokens:
-    #     stem_tokens.append(ps.stem(token))
-    # token_with_position = []
-    # for i in range(0, len(tokens)):
-    #     token_with_position.append({"token": tokens[i], "position": i})
-    # filtered_tokens = [
-    #     word_with_position for word_with_position in token_with_position if not word_with_position["token"] in stopwords]
     return tokens
 
 
@@ -54,6 +45,7 @@ def preprocessing_all(tokens):
     return filtered_tokens
 
 
+# function use to sort the data
 def get_token(index):
     return index.get('token')
 
@@ -97,5 +89,6 @@ f = open("positional-index.txt", "w")
 f.write(str(positional_index))
 f.close()
 
+# store in file as binary
 with open('positional-index.p', 'wb') as fp:
     pickle.dump(positional_index, fp, protocol=pickle.HIGHEST_PROTOCOL)

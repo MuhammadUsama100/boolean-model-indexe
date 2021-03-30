@@ -15,6 +15,7 @@ file2 = open(
     "G:/University/SEMESTER/SIXSEMESTER/IR/assignment/ass1/dataset/Stopword-List.txt", 'r',  encoding='utf8')
 lines = file2.readlines()
 
+# creating a list of stop word each word is strip before adding to stop word list 
 stopwords = []
 for i in lines:
     if(i.rstrip("\n") != ""):
@@ -22,9 +23,7 @@ for i in lines:
 print(stopwords)
 
 
-#ps = PorterStemmer()
-
-
+# breaking the value to tokens 
 def preprocessing(sentence):
     sentence = sentence.lower()
     tokenizer = RegexpTokenizer(r'\w+')
@@ -62,5 +61,6 @@ for key in inverted_index:
 # f.write(str(inverted_index))
 # f.close()
 
+# store is file a binary object
 with open('inverted-index.p', 'wb') as fp:
     pickle.dump(inverted_index, fp, protocol=pickle.HIGHEST_PROTOCOL)
