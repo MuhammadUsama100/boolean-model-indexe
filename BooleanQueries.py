@@ -53,23 +53,36 @@ ps = PorterStemmer()
 
 
 def process_query(processed_quries, dictionary_inverted):
+    universal = set()
+    for i in range(1, 51):
+        universal.add(i)
     selected_index = []
-    for quries in processed_quries:
-        if(quries == "and"):
+    for index in range(0, len(processed_quries)):
+        print(processed_quries[index])
+        if(processed_quries[index] == "and"):
             selected_index[0] = selected_index[0].intersection(
                 selected_index[1])
             selected_index.remove(selected_index[1])
-        elif (quries == "or"):
+        elif (processed_quries[index] == "or"):
             selected_index[0] = selected_index[0].union(
                 selected_index[1])
             selected_index.remove(selected_index[1])
-        elif (quries == "not"):
-            print(selected_index)
-            selected_index[0] = selected_index[0].difference(
-                selected_index[1])
-            selected_index.remove(selected_index[1])
+        elif (processed_quries[index] == "not"):
+            if len(selected_index) == 1:
+                selected_index[0] = universal.difference(selected_index[0])
+            elif (processed_quries[index+1] == "and"):
+                selected_index[1] = universal.difference(selected_index[1])
+            else:
+                print("usama")
+                selected_index[0] = selected_index[0].difference(
+                    selected_index[1])
+                selected_index.remove(selected_index[1])
         else:
-            selected_index.append(dictionary_inverted[quries][0])
+            try:
+                selected_index.append(
+                    dictionary_inverted[processed_quries[index]][0])
+            except:
+                selected_index.append(set())
     return selected_index[0]
 
 
@@ -83,7 +96,7 @@ def proximity_search(proximity_query, positional_index):
             if (key == key2):
                 for val in value:
                     for val2 in value2:
-                        if(int(val)+(int(jump)+1) == int(val2)):
+                        if(int(val)+(int(jump)+1) == int(val2) or int(val)-(int(jump)+1) == int(val2)):
                             x.add(key)
     return x
 
@@ -98,17 +111,15 @@ CORS(app)
 def process():
     try:
         if request.method == 'POST':
-            q = request.get_json()["query"]
+            q = str(request.get_json()["query"]).lower().strip()
             print(q)
 
             result = ""
             if(re.search("/[0-9]", q)):
                 result = proximity_search(q.split(" "), data2)
             else:
+                print(postfix(q.split(" ")))
                 result = process_query(postfix(q.split(" ")), data)
             return {"resultset": list(result)}
     except:
         return {"err": str("ERROR DUE TO INVALID QUERY")}
-
-
-
