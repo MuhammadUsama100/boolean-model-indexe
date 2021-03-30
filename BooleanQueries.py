@@ -64,6 +64,7 @@ def process_query(processed_quries, dictionary_inverted):
                 selected_index[1])
             selected_index.remove(selected_index[1])
         elif (quries == "not"):
+            print(selected_index)
             selected_index[0] = selected_index[0].difference(
                 selected_index[1])
             selected_index.remove(selected_index[1])
