@@ -18,7 +18,7 @@ with open('positional-index.p', 'rb') as fp:
 operators = {
     "or": 1,
     "and": 2,
-    "not": 3,
+    # "not": 3,
     "/": 0
 }
 proximity_operator = [
@@ -68,15 +68,32 @@ def process_query(processed_quries, dictionary_inverted):
                 selected_index[1])
             selected_index.remove(selected_index[1])
         elif (processed_quries[index] == "not"):
-            if len(selected_index) == 1:
-                selected_index[0] = universal.difference(selected_index[0])
-            elif (processed_quries[index+1] == "and"):
-                selected_index[1] = universal.difference(selected_index[1])
-            else:
-                print("usama")
-                selected_index[0] = selected_index[0].difference(
-                    selected_index[1])
-                selected_index.remove(selected_index[1])
+            if len(selected_index) == 0:
+                try:
+                    selected_index.append(universal.difference(
+                        dictionary_inverted[processed_quries[index+1]][0]))
+                except:
+                    selected_index.append(universal)
+                index = index + 2
+            elif (len(processed_quries)-1 < index + 2):
+                continue
+            elif ((processed_quries[index+2] != "and" or processed_quries[index+2] != "or")):
+                try:
+                    selected_index.append(universal.difference(
+                        dictionary_inverted[processed_quries[index+1]][0]))
+                except:
+                    selected_index.append(universal)
+                index = index + 2
+
+            # if len(selected_index) == 1:
+            #     selected_index[0] = universal.difference(selected_index[0])
+            # elif (processed_quries[index+1] == "and"):
+            #     selected_index[1] = universal.difference(selected_index[1])
+            # else:
+            #     print("usama")
+            #     selected_index[0] = selected_index[0].difference(
+            #         selected_index[1])
+            #     selected_index.remove(selected_index[1])
         else:
             try:
                 selected_index.append(
@@ -113,7 +130,6 @@ def process():
         if request.method == 'POST':
             q = str(request.get_json()["query"]).lower().strip()
             print(q)
-
             result = ""
             if(re.search("/[0-9]", q)):
                 result = proximity_search(q.split(" "), data2)
