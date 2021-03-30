@@ -111,5 +111,4 @@ def process():
         return {"err": str("ERROR DUE TO INVALID QUERY")}
 
 
-if __name__ == '__main__':
-    app.run()
+
