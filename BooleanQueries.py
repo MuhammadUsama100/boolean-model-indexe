@@ -131,6 +131,6 @@ def process():
             else:
                 print(postfix(q.split(" ")))
                 result = process_query(postfix(q.split(" ")), data)
-            return {"resultset": list(result)}
+            return {"resultset": list(result).sort()}
     except:
         return {"err": str("ERROR DUE TO INVALID QUERY")}
