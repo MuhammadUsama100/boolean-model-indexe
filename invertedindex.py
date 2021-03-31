@@ -1,6 +1,6 @@
 import nltk
 from nltk.tokenize import RegexpTokenizer
-# from nltk.stem import PorterStemmer
+from nltk.stem import PorterStemmer
 import pickle
 
 array = []
@@ -15,7 +15,7 @@ file2 = open(
     "G:/University/SEMESTER/SIXSEMESTER/IR/assignment/ass1/dataset/Stopword-List.txt", 'r',  encoding='utf8')
 lines = file2.readlines()
 
-# creating a list of stop word each word is strip before adding to stop word list 
+# creating a list of stop word each word is strip before adding to stop word list
 stopwords = []
 for i in lines:
     if(i.rstrip("\n") != ""):
@@ -23,12 +23,19 @@ for i in lines:
 print(stopwords)
 
 
-# breaking the value to tokens 
+ps = PorterStemmer()
+
+# breaking the value to tokens
+
+
 def preprocessing(sentence):
     sentence = sentence.lower()
     tokenizer = RegexpTokenizer(r'\w+')
     tokens = tokenizer.tokenize(sentence)
-    filtered_tokens = [word for word in tokens if not word in stopwords]
+    stem_tokens = []
+    for token in tokens:
+        stem_tokens.append(ps.stem(token))
+    filtered_tokens = [word for word in stem_tokens if not word in stopwords]
     return filtered_tokens
 
 
@@ -42,7 +49,7 @@ for doc in array:
 
 print(len(processed_array))
 
-
+# used data structure in inverted index list dic/maps set
 inverted_index = {}
 
 for index in range(1, len(processed_array)+1):

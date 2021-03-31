@@ -1,6 +1,7 @@
 import re
 from flask import Flask, request
 from flask_cors import CORS, cross_origin
+from nltk.stem import PorterStemmer
 import pickle
 
 # read inverted and positional index using binary file read
@@ -97,6 +98,8 @@ def process_query(processed_quries, dictionary_inverted):
 # we have first extracted first value and second value from then positional index
 # the term with / operator is assigned to jump operator
 # know we have found the relavent position for words and then add the jump to that value and compared to other value
+# assemption is that i have used proximity at = not <= as it was failing the proximity in solution set but if it is an issue u could change it its only one word change
+# I have also made assemption to have stem stored in the index of documents
 
 
 def proximity_search(proximity_query, positional_index):
@@ -114,6 +117,41 @@ def proximity_search(proximity_query, positional_index):
     return x
 
 
+def phrase_search(q, positional_index):
+    q = q.strip("'")
+    q = q.strip()  # to remove white space in the phrase query
+    phrase_query = []
+    for val in q.split(" "):
+        phrase_query.append(ps.stem(val))
+    combine_doc = {}
+    for index in range(0, len(phrase_query)):
+        if(len(combine_doc) == 0):
+            combine_doc = positional_index[str(
+                phrase_query[index])][1]
+
+        else:
+            match = {}
+            print(positional_index[phrase_query[index]][1])
+            for key, value in combine_doc.items():
+                for key1, value2 in positional_index[phrase_query[index]][1].items():
+                    print("1")
+                    if(key == key1):
+                        print("2")
+                        for position in value:
+                            for position2 in value2:
+                                if (position+1 == position2):
+                                    match[key] = set()
+                                    match[key].add(position2)
+            combine_doc = match
+    relevent_docs = set()
+    for keys in combine_doc:
+        relevent_docs.add(int(keys))
+    return relevent_docs
+
+
+ps = PorterStemmer()
+
+
 app = Flask(__name__)
 CORS(app)
 
@@ -125,12 +163,17 @@ def process():
         if request.method == 'POST':
             q = str(request.get_json()["query"]).lower().strip()
             print(q)
+            query = []
+            for val in q.split(" "):
+                query.append(ps.stem(val))
             result = ""
             if(re.search("/[0-9]", q)):
-                result = proximity_search(q.split(" "), data2)
+                result = sorted(proximity_search(query, data2))
+            elif (q[0] == "'" and q[-1] == "'"):
+                result = sorted(phrase_search(q, data2))
             else:
-                print(postfix(q.split(" ")))
-                result = process_query(postfix(q.split(" ")), data)
-            return {"resultset": list(result).sort()}
+                print(postfix(query))
+                result = sorted(process_query(postfix(query), data))
+            return {"resultset": list(result)}
     except:
         return {"err": str("ERROR DUE TO INVALID QUERY")}

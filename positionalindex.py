@@ -33,13 +33,16 @@ def preprocessing(sentence):
     return tokens
 
 
+ps = PorterStemmer()
+
+
 def preprocessing_all(tokens):
-     # stem_tokens = []
-    # for token in tokens:
-    #     stem_tokens.append(ps.stem(token))
+    stem_tokens = []
+    for token in tokens:
+        stem_tokens.append(ps.stem(token))
     token_with_position = []
-    for i in range(0, len(tokens)):
-        token_with_position.append({"token": tokens[i], "position": i})
+    for i in range(0, len(stem_tokens)):
+        token_with_position.append({"token": stem_tokens[i], "position": i})
     filtered_tokens = [
         word_with_position for word_with_position in token_with_position if not word_with_position["token"] in stopwords]
     return filtered_tokens
