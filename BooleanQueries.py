@@ -2,6 +2,7 @@ import re
 from flask import Flask, request
 from flask_cors import CORS, cross_origin
 from nltk.stem import PorterStemmer
+from pattern.en import singularize
 import pickle
 
 # read inverted and positional index using binary file read
@@ -102,7 +103,13 @@ def process_query(processed_quries, dictionary_inverted):
 # I have also made assemption to have stem stored in the index of documents
 
 
-def proximity_search(proximity_query, positional_index):
+def proximity_search(q, positional_index):
+    proximity_query = []
+    for val in q.split(" "):
+        if val.find("/"):
+            proximity_query.append(val)
+        else:
+            proximity_query.append(singularize(val))
     first_value = positional_index[proximity_query[0]][1]
     secound_value = positional_index[proximity_query[1]][1]
     jump = int(proximity_query[2].split("/")[-1])
@@ -122,7 +129,7 @@ def phrase_search(q, positional_index):
     q = q.strip()  # to remove white space in the phrase query
     phrase_query = []
     for val in q.split(" "):
-        phrase_query.append(ps.stem(val))
+        phrase_query.append(singularize(val))
     combine_doc = {}
     for index in range(0, len(phrase_query)):
         if(len(combine_doc) == 0):
@@ -165,10 +172,10 @@ def process():
             print(q)
             query = []
             for val in q.split(" "):
-                query.append(ps.stem(val))
+                query.append(singularize(val))
             result = ""
             if(re.search("/[0-9]", q)):
-                result = sorted(proximity_search(query, data2))
+                result = sorted(proximity_search(q, data2))
             elif (q[0] == "'" and q[-1] == "'"):
                 result = sorted(phrase_search(q, data2))
             else:

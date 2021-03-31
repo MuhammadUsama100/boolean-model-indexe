@@ -1,6 +1,8 @@
 import nltk
 from nltk.tokenize import RegexpTokenizer
-from nltk.stem import PorterStemmer
+#from nltk.stem import PorterStemmer
+from pattern.en import singularize
+
 import pickle
 
 # file read
@@ -33,13 +35,13 @@ def preprocessing(sentence):
     return tokens
 
 
-ps = PorterStemmer()
+#ps = PorterStemmer()
 
 
 def preprocessing_all(tokens):
     stem_tokens = []
     for token in tokens:
-        stem_tokens.append(ps.stem(token))
+        stem_tokens.append(singularize(token))
     token_with_position = []
     for i in range(0, len(stem_tokens)):
         token_with_position.append({"token": stem_tokens[i], "position": i})

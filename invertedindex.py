@@ -1,6 +1,7 @@
 import nltk
 from nltk.tokenize import RegexpTokenizer
-from nltk.stem import PorterStemmer
+#from nltk.stem import PorterStemmer
+from pattern.en import singularize
 import pickle
 
 array = []
@@ -23,7 +24,7 @@ for i in lines:
 print(stopwords)
 
 
-ps = PorterStemmer()
+#ps = PorterStemmer()
 
 # breaking the value to tokens
 
@@ -33,8 +34,10 @@ def preprocessing(sentence):
     tokenizer = RegexpTokenizer(r'\w+')
     tokens = tokenizer.tokenize(sentence)
     stem_tokens = []
+    # for token in tokens:
+    #     stem_tokens.append(ps.stem(token))
     for token in tokens:
-        stem_tokens.append(ps.stem(token))
+        stem_tokens.append(singularize(token))
     filtered_tokens = [word for word in stem_tokens if not word in stopwords]
     return filtered_tokens
 
